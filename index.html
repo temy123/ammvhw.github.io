@@ -8,90 +8,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
-  </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
     integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
-  </script>
+  </script> -->
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
   </script>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+  <script src="/main.js"></script>
+
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-  <style>
-    form-check-label: {
-      padding: 4px;
-    }
-  </style>
 </head>
 
 <body>
   <h1> 테스트 페이지 ! </h1>
-  <script type="text/javascript">
-    var host = "https://t6.tvmeka.com/bbs/board.php?bo_table=";
-
-    const movie_type = ["kmovie", "engmovie", "animovie", "oldmovie", "19movie"];
-
-    function search() {
-      var selected = document.querySelector('[name="movie_type"]:checked').value;
-      var url = host + movie_type[selected];
-
-      var pageInput = document.querySelector('[name="page"]');
-      pageInput.value = url;
-
-      var headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36',
-        'origin': 't6.tvmeka.com',
-        'referer': 'https://t6.tvmeka.com/bbs/board.php?bo_table=oldmovie',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With'
-      };
-
-      var optionAxios = {
-        headers: headers
-      }
-
-      $.get(url, (data) => {
-        if (data) {
-          console.log(dadta);
-        }
-      });
-
-      $.ajax({
-        url: url,
-        type: "get",
-        success: function (result) {
-          if (result) {
-            console.log(result.body);
-          }
-        }
-      })
-
-      // axios.get(url, optionAxios)
-      //   .then(Response => {
-      //     console.log(response.body);
-      //   });
-
-      // axios({
-      //     method: 'get',
-      //     url: url,
-      //     header: ,
-      //     data: {}
-      //   })
-      //   .then(response => {
-      //     console.log(response.body);
-      //   })
-
-    }
-  </script>
-
 
   <div>
     <div class="form-check form-check-inline">
