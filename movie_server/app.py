@@ -28,6 +28,7 @@ def movie():
     _type = 'kmovie'
     _page = '1'
     _keyword = ''
+    _upstream = False
 
     print(params)
     if 'type' in params:
@@ -51,8 +52,9 @@ def movie():
             img_element = media.find('img')
             a_element = media.find(class_='media-heading').find('a')
             href = a_element['href']
+            href = f'https://t6.tvmeka.com/bbs/{href}'
             title = a_element.text.strip()
-            detail_num = urlparse(f'https://t6.tvmeka.com/bbs/{href}')
+            detail_num = urlparse(href)
             detail_num = ''.join(parse_qs(detail_num.query)['wr_id'])
             img_link = ''
             try:
@@ -88,8 +90,22 @@ def movie():
                 'detail_num': detail_num.strip(),
                 'img_link': img_link.strip(),
             })
+    if 'upstream' in params:
+        result = movie_except_upstream(_type, result)
 
     return json.dumps(result)
+
+
+def movie_except_upstream(_type, result):
+    new_result = []
+    for d_ in result:
+        dd = request_detail(_type, d_['detail_num'])
+        if 0 < len(dd):
+            d_['video_link'] = dd[0]['detail']
+            new_result.append(d_)
+            continue
+
+    return new_result
 
 
 def evoload(link):
@@ -111,20 +127,12 @@ def evoload(link):
     return response.text
 
 
-@app.route('/movie/detail', methods=['GET'])
-def detail():
-    params = request.args.to_dict()
-    if not ('num' in params) or not ('type' in params):
-        return {'Error': 'No Link'}
-    type_ = params['type']
-    num_ = params['num']
-
+def request_detail(type_, num_):
     link = f'https://t6.tvmeka.com/bbs/board.php?bo_table={type_}&wr_id={num_}&page=1'
 
     response = requests.get(link)
     bs4 = BeautifulSoup(response.text, 'html.parser')
     table = bs4.find(class_='type11')
-    clipboard.copy(link)
     links = table.find_all('a')
 
     result = []
@@ -134,7 +142,8 @@ def detail():
         video_link = ''
 
         # TODO: 나중에는 모든 사이트에 비디오 링크 내놓도록
-        if not ('upstream' in name) and not ('Upstream' in name):
+        name = name.lower()
+        if not ('upstream' in name):
             continue
 
         # if 'Evo' in name or 'evo' in name:
@@ -152,8 +161,74 @@ def detail():
             'video': video_link
         })
 
+    return result
+
+
+@app.route('/movie/detail', methods=['GET'])
+def detail():
+    params = request.args.to_dict()
+    if not ('num' in params) or not ('type' in params):
+        return {'Error': 'No Link'}
+    type_ = params['type']
+    num_ = params['num']
+
+    result = request_detail(type_, num_)
+
     return json.dumps(result)
 
 
+@app.route('/youtube', methods=['GET'])
+def youtube():
+    params = request.args.to_dict()
+
+    _keyword = ''
+    _page = '1'
+
+    if 'keyword' in params:
+        _keyword = params['keyword']
+
+    if 'page' in params:
+        _page = params['page']
+
+    headers = {
+        'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+
+    }
+    response = requests.get(f'https://yewtu.be/search?q={_keyword}&page={_page}')
+    response.raise_for_status()
+    response.encoding = 'utf-8'
+
+    bs4 = BeautifulSoup(response.text, 'html.parser')
+
+    # clipboard.copy(response.text)
+
+    media_elements = bs4.find_all(class_='pure-u-1 pure-u-md-1-4')
+    for media in media_elements:
+        try:
+            title = media.find('div', class_='thumbnail').parent.find_all('p')[1].text.strip()
+        except:
+            title = media.find('a').text.strip()
+
+        thumb = media.find('img')['src']
+        link = ''
+        detail_link = ''
+        try:
+            link = media.find(class_='icon ion-logo-youtube').parent['href'].strip()
+            detail_link = link.split('?v=')[1]
+            detail_link = f'https://youtube.com/embed/{detail_link}?vq=1080p'
+        except:
+            pass
+
+        zip_ = {
+            'title': title,
+            'thumb': thumb,
+            'link': link,
+            'embed_link': detail_link
+        }
+        print(zip_)
+
+    return '{}'
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=4321)
+    app.run(debug=True, host='0.0.0.0', port=4321)
