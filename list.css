@@ -1,7 +1,46 @@
+input[type="radio"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    cursor: pointer;
+    /* clicky clicky */
+}
+
+/* the adjacent selector allows us to select the span who follows and is a sibling of our radio input(s) */
+input[type="radio"]+span {
+    display: block;
+    background-color: #4884ff;
+    color: white;
+    display: block;
+    text-align: center;
+    border: 2px solid transparent;
+    -webkit-transition: background-color 0.4s linear;
+    transition: background-color 0.4s linear;
+}
+
+/* don't forget to style a focused state! */
+input[type="radio"]:focus+span {
+    box-shadow: 0 0 8px #51cbee;
+    border-color: #51cbee;
+}
+
+/* when the input is checked style the span differently */
+input[type="radio"]:checked+span {
+    background-color: #CC3300;
+}
+
+
+
 * {
     box-sizing: border-radius;
     font-family: 'Rubik', sans-serif;
 }
+
 /* .container {
     border: 1px solid black;
     position: absolute;
@@ -20,6 +59,7 @@
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
     border-top: 10px solid #0b5aa2;
 }
+
 .items-head p {
     padding: 5px 20px;
     margin: 10px;
@@ -27,17 +67,20 @@
     font-weight: bold;
     font-size: 20px;
 }
+
 .items-head hr {
     width: 20%;
     margin: 0px 30px;
     border: 1px solid #0b5aa2;
 }
+
 .items-body {
     padding: 10px;
     margin: 10px;
     display: grid;
     grid-gap: 10px;
 }
+
 .items-body-content {
     padding: 10px;
     padding-right: 0px;
@@ -48,10 +91,12 @@
     border: 1px solid transparent;
     cursor: pointer;
 }
+
 .items-body-content:hover {
     border-radius: 15px;
     border: 1px solid #0b5aa2;
 }
+
 .items-body-content i {
     align-self: center;
     font-size: 15px;
@@ -59,11 +104,15 @@
     font-weight: bold;
     animation: icon 1.5s infinite forwards;
 }
+
 @keyframes icon {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translate(0px);
-   }
+    }
+
     50% {
         transform: translate(3px);
-   }
+    }
 }
