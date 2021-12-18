@@ -1,40 +1,70 @@
-input[type="radio"] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+*,
+*:after,
+*:before {
+    box-sizing: border-box;
+}
+
+.custom_form {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.custom_label {
+    display: flex;
     cursor: pointer;
-    /* clicky clicky */
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0.375em;
+    /* Accessible outline */
+    /* Remove comment to use */
+    /* &:focus-within {
+        outline: .125em solid $primary-color;
+   }
+    */
 }
 
-/* the adjacent selector allows us to select the span who follows and is a sibling of our radio input(s) */
-input[type="radio"]+span {
-    display: block;
-    background-color: #4884ff;
-    color: white;
-    display: block;
-    text-align: center;
-    border: 2px solid transparent;
-    -webkit-transition: background-color 0.4s linear;
-    transition: background-color 0.4s linear;
+.custom_label input {
+    position: absolute;
+    left: -9999px;
 }
 
-/* don't forget to style a focused state! */
-input[type="radio"]:focus+span {
-    box-shadow: 0 0 8px #51cbee;
-    border-color: #51cbee;
+.custom_label input:checked+span {
+    background-color: #d6d6e5;
 }
 
-/* when the input is checked style the span differently */
-input[type="radio"]:checked+span {
-    background-color: #CC3300;
+.custom_label input:checked+span:before {
+    box-shadow: inset 0 0 0 0.4375em #00005c;
+}
+
+.custom_label span {
+    display: flex;
+    align-items: center;
+    padding: 0.375em 0.75em 0.375em 0.375em;
+    border-radius: 99em;
+    transition: 0.25s ease;
+}
+
+.custom_label span:hover {
+    background-color: #d6d6e5;
+}
+
+.custom_label span:before {
+    display: flex;
+    flex-shrink: 0;
+    content: "";
+    background-color: #fff;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    margin-right: 0.375em;
+    transition: 0.25s ease;
+    box-shadow: inset 0 0 0 0.125em #00005c;
 }
 
 
+/* 밑은 리스트 */
 
 * {
     box-sizing: border-radius;
