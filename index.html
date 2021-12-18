@@ -2,87 +2,37 @@
 <html lang="en">
 
 <head>
-  <title>영화 뚫기</title>
+  <title>Title</title>
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
-  </script> -->
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
-  </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
-  <!-- <script src="jquery-cross.js"></script> -->
-  <script src="main.js"></script>
-
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="list.css">
-
-
-  <style>
-    iframe {
-      width: 500px;
-      height: 500px;
-    }
-  </style>
-
 </head>
 
 <body>
 
-  <div>
-    <p>영화 선택하기</p>
-
-    <button name="movie_type" type="button" class="btn btn-info activate active" data-toggle="button"
-      aria-pressed="true" autocomplete="off">한국영화</button>
-    <button name="movie_type" type="button" class="btn btn-info" data-toggle="button" aria-pressed="false"
-      autocomplete="off">외국영화</button>
-    <button name="movie_type" type="button" class="btn btn-info" data-toggle="button" aria-pressed="false"
-      autocomplete="off">애니메이션</button>
-    <button name="movie_type" type="button" class="btn btn-info" data-toggle="button" aria-pressed="false"
-      autocomplete="off">요청영화</button>
-    <button name="movie_type" type="button" class="btn btn-info" data-toggle="button" aria-pressed="false"
-      autocomplete="off">19영화</button>
-
-  </div>
-  <br />
-  <br />
-
-  <a href="http://naver.com">이건 되냐 시발련아</a>
-  
-
-
   <div class="container">
-    <div class="form-group" style="float: left; width:70%;">
-      <label for="keyword">검색어</label>
-      <input type="text" class="form-control" name="keyword" id="keyword" aria-describedby="helpId"
-        placeholder="검색어를 입력하세요">
-    </div>
-    <div class="form-group" style="float: left; width:30%;">
-      <label for="page">페이지</label>
-      <input type="text" class="form-control" value="1" name="page" id="page" aria-describedby="helpId"
-        placeholder="페이지를 입력하세요">
-    </div>
-  </div>
-  <div class="container">
-    <a href="javascript:prev();"> 이전 </a>
-    <button onclick="search()" type="button" class="btn btn-primary">검색</button>
-    <a href="javascript:next();"> 다음 </a>
+
+    <a name="movie" id="movie" class="btn btn-dark" href="/movie.html" role="button">영화 사이트로 이동</a>
+    <a name="youtube" id="youtube" class="btn btn-dark" href="/youtube.html" role="button">유튜브 사이트로 이동</a>
+
   </div>
 
-  <div id="list" class="container" style="margin-top: 12px;;">
-    <div class="items">
-      <div id="parent" class="items-body">
-      </div>
-    </div>
-  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  </script>
 </body>
 
 </html>

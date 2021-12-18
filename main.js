@@ -1,10 +1,11 @@
-var host = 'http://ipleOffice.iptime.org:4444/';
+var host = 'http://ipleOffice.iptime.org:4321/';
 // var host = "https://t6.tvmeka.com/bbs/board.php?bo_table=";
 
 const movie_type = ["kmovie", "engmovie", "animovie", "oldmovie", "19movie"];
 
 function search() {
     var pageInput = document.querySelector('[name="page"]');
+    // var selected = 0;
     var selected = getMovieType();
     var url = host + 'movie?type=' + movie_type[selected];
 
@@ -23,7 +24,6 @@ function search() {
             data: {}
         })
         .then(response => {
-            document.getElementById('page').value = '검색 된다고 시발련아';
             addList(response.data);
         })
 }
