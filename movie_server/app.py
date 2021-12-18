@@ -7,8 +7,13 @@ from urllib.parse import urlparse, parse_qs
 from bs4 import BeautifulSoup
 from flask import Flask
 from flask import request
+from flask_cors import CORS
 
 app = Flask(__name__)
+cors = CORS(app, resources={"*": {"origins": "*"}})
+
+
+# CORS(app)
 
 
 @app.route('/')
@@ -22,6 +27,7 @@ def movie():
 
     _type = 'kmovie'
     _page = '1'
+    _keyword = ''
 
     print(params)
     if 'type' in params:
@@ -30,24 +36,58 @@ def movie():
     if 'page' in params:
         _page = params['page']
 
-    response = requests.get(f'https://t6.tvmeka.com/bbs/board.php?bo_table={_type}&page={_page}')
-    bs4 = BeautifulSoup(response.text, 'html.parser')
-    movie_list = bs4.find('div', class_='list-container')
-    movie_list = movie_list.find_all('div', class_='list-item')
+    if 'keyword' in params:
+        _keyword = params['keyword']
+        response = requests.get(
+            f'https://t6.tvmeka.com/bbs/search.php?sfl=wr_subject%7C%7Cwr_content&stx={_keyword}&sop=and&gr_id=&onetable={_type}&page={_page}')
+        bs4 = BeautifulSoup(response.text, 'html.parser')
+        try:
+            media_elements = bs4.find(class_='search-media').find_all('div', class_='media')
+        except:
+            return {}
 
-    result = []
-    for movie_ in movie_list:
-        title = movie_.find('h2').find('a').text
-        detail_link = movie_.find('h2').find('a')['href']
-        detail_num = urlparse(detail_link)
-        detail_num = parse_qs(detail_num.query)['wr_id']
-        img_link = movie_.find('div', 'img-item').find('a')['href']
-        result.append({
-            'title': title.strip(),
-            'detail_link': detail_link.strip(),
-            'detail_num': detail_num.strip(),
-            'img_link': img_link.strip(),
-        })
+        result = []
+        for media in media_elements:
+            img_element = media.find('img')
+            a_element = media.find(class_='media-heading').find('a')
+            href = a_element['href']
+            title = a_element.text.strip()
+            detail_num = urlparse(f'https://t6.tvmeka.com/bbs/{href}')
+            detail_num = ''.join(parse_qs(detail_num.query)['wr_id'])
+            img_link = ''
+            try:
+                img_link = img_element['src']
+            except:
+                pass
+
+            result.append({
+                'title': title.strip(),
+                'detail_link': href.strip(),
+                'detail_num': detail_num.strip(),
+                'img_link': img_link.strip(),
+            })
+
+    else:
+
+        response = requests.get(f'https://t6.tvmeka.com/bbs/board.php?bo_table={_type}&page={_page}')
+        bs4 = BeautifulSoup(response.text, 'html.parser')
+        movie_list = bs4.find('div', class_='list-container')
+        movie_list = movie_list.find_all('div', class_='list-item')
+
+        result = []
+        for movie_ in movie_list:
+            title = movie_.find('h2').find('a').text
+            detail_link = movie_.find('h2').find('a')['href']
+            detail_num = urlparse(detail_link)
+            detail_num = ''.join(parse_qs(detail_num.query)['wr_id'])
+            # print(detail_num)
+            img_link = movie_.find('div', 'img-item').find('a')['href']
+            result.append({
+                'title': title.strip(),
+                'detail_link': detail_link.strip(),
+                'detail_num': detail_num.strip(),
+                'img_link': img_link.strip(),
+            })
 
     return json.dumps(result)
 
@@ -116,4 +156,4 @@ def detail():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=4321)
