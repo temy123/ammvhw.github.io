@@ -17,11 +17,39 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="list.css">
 
+    <!-- 로딩바 -->
+    <link rel="stylesheet" type="text/css" href="/css/loading-bar.min.css" />
+    <script type="text/javascript" src="/js/loading-bar.min.js"></script>
 </head>
 
 <body>
 
-    <div>
+    <div class="card">
+        <div class="card-header">
+            영화 보기 크롤링 사이트 (티비메카 기반)
+        </div>
+    </div>
+
+
+    <div id="progress">
+        <!-- 로딩바 -->
+        <img src="imgs/progress.gif" />
+    </div>
+
+
+    <div class="container" style="margin-top: 12px;;">
+        <div class="form-group" style="float: left; width:70%;">
+            <label for="keyword">검색어</label>
+            <input type="text" class="form-control" name="keyword" id="keyword" aria-describedby="helpId"
+                placeholder="검색어를 입력하세요">
+        </div>
+        <div class="form-group" style="float: left; width:30%;">
+            <label for="page">페이지</label>
+            <input type="text" class="form-control" value="1" name="page" id="page" aria-describedby="helpId"
+                placeholder="페이지를 입력하세요">
+        </div>
+    </div>
+    <div class="container">
         <p>영화 선택하기</p>
 
         <button name="movie_type" type="button" class="btn btn-info activate active" data-toggle="button"
@@ -37,27 +65,13 @@
 
     </div>
     <br />
-    <br />
-
-    <div class="container">
-        <div class="form-group" style="float: left; width:70%;">
-            <label for="keyword">검색어</label>
-            <input type="text" class="form-control" name="keyword" id="keyword" aria-describedby="helpId"
-                placeholder="검색어를 입력하세요">
-        </div>
-        <div class="form-group" style="float: left; width:30%;">
-            <label for="page">페이지</label>
-            <input type="text" class="form-control" value="1" name="page" id="page" aria-describedby="helpId"
-                placeholder="페이지를 입력하세요">
-        </div>
-    </div>
-    <div class="container">
+    <div class="container" style="text-align: center;">
         <a href="javascript:prev();"> 이전 </a>
         <button onclick="search()" type="button" class="btn btn-primary">검색</button>
         <a href="javascript:next();"> 다음 </a>
     </div>
 
-    <div id="list" class="container" style="margin-top: 12px;;">
+    <div id="list" class="container" style="margin-top: 40px;;">
         <div id="movie_container" class="items">
             <div id="parent" class="items-body">
             </div>

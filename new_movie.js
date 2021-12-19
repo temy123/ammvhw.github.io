@@ -3,42 +3,83 @@ var host = 'http://ipleOffice.iptime.org:4321/';
 
 const movie_type = ["kmovie", "engmovie", "animovie", "oldmovie", "19movie"];
 
+function getKeyword() {
+    return $('#keyword').val();
+}
+
 function search() {
     var pageInput = document.getElementById('page');
-    var selected = getMovieType();
-    var url = host + 'movie?type=' + movie_type[selected];
+    var typeIndex = getMovieType();
+    const movieType = movie_type[typeIndex];
+    var url = host + 'movie?type=' + movieType;
 
     if (!pageInput.value) {
         pageInput.value = 1;
     }
 
     url = url + '&page=' + pageInput.value;
+    url = url + '&upstream=true';
+
+    if (getKeyword()) {
+        url = url + '&keyword=' + getKeyword();
+    }
+
+    $('#parent').empty();
 
     $.get(url, '',
-        function (data, textStatus, jqXHR) {
-            addList(data);
+        function (movieData, textStatus, jqXHR) {
+            history.replaceState({
+                'movieData': movieData,
+                'movieType': getMovieType(),
+                'page': getPage()
+            }, '', '/movie##');
         },
         "json"
     );
 
 }
 
+function addMovies(movieData) {
+    for (var i = 0; i < movieData.length; i++) {
+        var movieInfo = movieData[i];
+        addList(movieInfo);
+    }
+}
+
+function getDetailInfo(type, data, callback) {
+    var url = 'http://ipleOffice.iptime.org:4321/movie/detail?type=' + type + ' &num=' + data['detail_num']
+
+    $.ajax({
+        type: "GET",
+        url: url,
+        dataType: "json",
+        async: false,
+        success: callback
+    });
+}
+
 function setLog(text) {
     $('#keyword').val(text);
 }
 
-function addList(res) {
-    var listGroup = $('#parent');
-    listGroup.empty();
+function setPage(pages) {
+    $('#page').val(pages);
+}
 
-    for (var i = 0; i < res.length; i++) {
-        var d = res[i];
-        var title = d['title'];
-        var detail = d['detail_link'];
-        var detail_num = d['detail_num'];
-        var html = '<a href="' + detail + '" class="items-body-content" >' + title + '</a><br />';
-        listGroup.append(html);
-    }
+function getPage() {
+    return $('#page').val();
+}
+
+function addList(d) {
+    var listGroup = $('#parent');
+
+    var title = d['title'];
+    var detail = d['video_link'];
+    var html = '<a href="' + detail + '" class="items-body-content" >' + title + '</a><br />';
+
+    console.log(d);
+
+    listGroup.append(html);
 
 }
 
@@ -47,6 +88,7 @@ function next() {
     var pageDom = document.getElementById('page');
     pageDom.value = (pageDom.value * 1) + 1;
     search();
+
 }
 
 function prev() {
@@ -72,7 +114,26 @@ function getMovieType() {
     return 0;
 }
 
+function showProgress() {
+    $('#progress').show();
+}
+
+function hideProgress() {
+    $('#progress').hide();
+}
+
+var loadingBar = null;
 window.onload = function () {
+
+
+    $(document).ajaxStart(function () {
+            showProgress(); //ajax실행시 로딩바를 보여준다.
+        })
+        .ajaxStop(function () {
+            hideProgress(); //ajax종료시 로딩바를 숨겨준다.
+        });
+
+    hideProgress();
 
     var unselectAllMovieBtn = function () {
         var btnMovies = getMovieButtons();
@@ -91,20 +152,8 @@ window.onload = function () {
             unselectAllMovieBtn();
             this.setAttribute('aria-pressed', true);
             this.className += ' activate active'
+            setPage(1);
         }
     }
-
-    // var btnMovies = getMovieButtons();
-
-    // for (var i = 0; i < btnMovies.length; i++) {
-    //     const btn = btnMovies[i];
-    //     btn.onclick = function (e) {
-    //         setLog('test');
-    //         unselectAllMovieBtn();
-    //         btn.setAttribute('aria-pressed', true);
-    //         btn.className += ' activate'
-
-    //     }
-    // }
 
 }

@@ -1,3 +1,10 @@
+#progress {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background: #ffffff;
+}
+
 *,
 *:after,
 *:before {
@@ -84,7 +91,7 @@
     background-color: #128cfc;
 } */
 .items {
-    width: 300px;
+    width: 100%;
     background: #fffffe;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
     border-top: 10px solid #0b5aa2;
