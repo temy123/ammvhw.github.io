@@ -28,11 +28,16 @@ function search() {
 
     $.get(url, '',
         function (movieData, textStatus, jqXHR) {
+            for (var i = 0; i < movieData.length; i++) {
+                var movieInfo = movieData[i];
+                addList(movieInfo);
+            }
+
             history.replaceState({
                 'movieData': movieData,
                 'movieType': getMovieType(),
                 'page': getPage()
-            }, '', '/movie##');
+            }, '', './movie.html##');
         },
         "json"
     );
@@ -75,7 +80,19 @@ function addList(d) {
 
     var title = d['title'];
     var detail = d['video_link'];
-    var html = '<a href="' + detail + '" class="items-body-content" >' + title + '</a><br />';
+    var thumb = d['img_link'];
+    var html = '';
+
+    console.log(thumb);
+    // html = '<a href="' + detail + '" class="items-body-content" >' + title + '</a><br />';
+
+    // html += '<div class="tv_card_body">';
+    html += '<a href="' + detail + '" class="items-body-content tv_card_body">';
+    html += '<div class="card">';
+    html += '<img class="card-img-top thumb" src="' + thumb + '">';
+    html += '<div class="card-body">';
+    html += '<h6 class="card-title">' + title + '</h6>';
+    html += '</div></div></a>';
 
     console.log(d);
 
@@ -156,4 +173,20 @@ window.onload = function () {
         }
     }
 
+    getCors();
+
+}
+
+function getCors() {
+    $.ajax({
+        type: "GET",
+        url: "http://ipleOffice.iptime.org:4321",
+        dataType: "json",
+        success: function (response) {
+            console.log('성공');
+        },
+        error: function (res, err) {
+            console.log(err);
+        }
+    });
 }
