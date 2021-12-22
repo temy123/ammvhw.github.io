@@ -1,4 +1,4 @@
-var host = 'http://ipleOffice.iptime.org:4321/';
+var host = 'http://ipleOffice.iptime.org:5005/';
 // var host = "https://t6.tvmeka.com/bbs/board.php?bo_table=";
 
 const movie_type = ["kmovie", "engmovie", "animovie", "oldmovie", "19movie"];

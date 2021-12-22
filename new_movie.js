@@ -1,7 +1,12 @@
-var host = 'http://ipleOffice.iptime.org:4321/';
+var host = 'http://ipleOffice.iptime.org:5005/';
 // var host = "https://t6.tvmeka.com/bbs/board.php?bo_table=";
 
 const movie_type = ["kmovie", "engmovie", "animovie", "oldmovie", "19movie"];
+
+
+function clearMovies() {
+    $('#parent').empty();
+}
 
 function getKeyword() {
     return $('#keyword').val();
@@ -24,7 +29,7 @@ function search() {
         url = url + '&keyword=' + getKeyword();
     }
 
-    $('#parent').empty();
+    clearMovies();
 
     $.get(url, '',
         function (movieData, textStatus, jqXHR) {
@@ -36,6 +41,7 @@ function search() {
             history.replaceState({
                 'movieData': movieData,
                 'movieType': getMovieType(),
+                'keyword': getKeyword(),
                 'page': getPage()
             }, '', './movie.html##');
         },
@@ -52,7 +58,7 @@ function addMovies(movieData) {
 }
 
 function getDetailInfo(type, data, callback) {
-    var url = 'http://ipleOffice.iptime.org:4321/movie/detail?type=' + type + ' &num=' + data['detail_num']
+    var url = 'http://ipleOffice.iptime.org:5005/movie/detail?type=' + type + ' &num=' + data['detail_num']
 
     $.ajax({
         type: "GET",
@@ -65,6 +71,14 @@ function getDetailInfo(type, data, callback) {
 
 function setLog(text) {
     $('#keyword').val(text);
+}
+
+function setKeyword(text) {
+    $('#keyword').val(text);
+}
+
+function setKeyword(keyword) {
+    $('#keyword').val(keyword);
 }
 
 function setPage(pages) {
@@ -139,6 +153,34 @@ function hideProgress() {
     $('#progress').hide();
 }
 
+function rebind(state) {
+    clearMovies();
+    addMovies(state.movieData);
+
+    unselectAllMovieBtn();
+    var selectBtn = getMovieButtons()[state.movieType];
+    selectBtn.setAttribute('aria-pressed', true);
+    selectBtn.className += ' activate active';
+
+    setKeyword(state.keyword);
+    setPage(state.page);
+}
+
+window.onpopstate = function (e) {
+    if (e.state) {
+        rebind(e.state);
+    }
+}
+
+function unselectAllMovieBtn() {
+    var btnMovies = getMovieButtons();
+    for (var i = 0; i < btnMovies.length; i++) {
+        var btn = btnMovies[i];
+        btn.setAttribute('aria-pressed', false);
+        btn.className = btn.className.replace(' activate', '').replace('active', '');
+    }
+}
+
 var loadingBar = null;
 window.onload = function () {
 
@@ -152,15 +194,6 @@ window.onload = function () {
 
     hideProgress();
 
-    var unselectAllMovieBtn = function () {
-        var btnMovies = getMovieButtons();
-        for (var i = 0; i < btnMovies.length; i++) {
-            var btn = btnMovies[i];
-            btn.setAttribute('aria-pressed', false);
-            btn.className = btn.className.replace(' activate', '').replace('active', '');
-        }
-    };
-
     var btns = getMovieButtons();
     for (var i = 0; i < btns.length; i++) {
         var btn = btns[i];
@@ -173,20 +206,4 @@ window.onload = function () {
         }
     }
 
-    getCors();
-
-}
-
-function getCors() {
-    $.ajax({
-        type: "GET",
-        url: "http://ipleOffice.iptime.org:4321",
-        dataType: "json",
-        success: function (response) {
-            console.log('성공');
-        },
-        error: function (res, err) {
-            console.log(err);
-        }
-    });
 }
