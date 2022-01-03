@@ -2,179 +2,33 @@ import requests
 import json
 import clipboard
 
-from urllib.parse import urlparse, parse_qs
+from core import returnResponse
 
 from bs4 import BeautifulSoup
-from flask import Flask
-from flask import request
+from flask import Flask, request, Response
+from flask_restx import Api
 from flask_cors import CORS
 
+from movie import movie_container
+import logging
+
+logging.getLogger('flask_cors').level = logging.DEBUG
+
 app = Flask(__name__)
-cors = CORS(app, resources={"*": {"origins": "*"}})
+api = Api(app)
 
+api.add_namespace(movie_container, '/movie')
 
-# CORS(app)
+CORS(app)
+
+YOUTUBE_API_KEY = 'AIzaSyBwHmyE3BylutJPfsMbDE-Dfur6am6LyIQ'
 
 
 @app.route('/')
 def main():
-    return '<p>TEST</p>'
-
-
-@app.route('/movie', methods=['GET'])
-def movie():
-    params = request.args.to_dict()
-
-    _type = 'kmovie'
-    _page = '1'
-    _keyword = ''
-    _upstream = False
-
-    print(params)
-    if 'type' in params:
-        _type = params['type']
-
-    if 'page' in params:
-        _page = params['page']
-
-    if 'keyword' in params:
-        _keyword = params['keyword']
-        response = requests.get(
-            f'https://t6.tvmeka.com/bbs/search.php?sfl=wr_subject%7C%7Cwr_content&stx={_keyword}&sop=and&gr_id=&onetable={_type}&page={_page}')
-        bs4 = BeautifulSoup(response.text, 'html.parser')
-        try:
-            media_elements = bs4.find(class_='search-media').find_all('div', class_='media')
-        except:
-            return {}
-
-        result = []
-        for media in media_elements:
-            img_element = media.find('img')
-            a_element = media.find(class_='media-heading').find('a')
-            href = a_element['href']
-            href = f'https://t6.tvmeka.com/bbs/{href}'
-            title = a_element.text.strip()
-            detail_num = urlparse(href)
-            detail_num = ''.join(parse_qs(detail_num.query)['wr_id'])
-            img_link = ''
-            try:
-                img_link = img_element['src']
-            except:
-                pass
-
-            result.append({
-                'title': title.strip(),
-                'detail_link': href.strip(),
-                'detail_num': detail_num.strip(),
-                'img_link': img_link.strip(),
-            })
-
-    else:
-
-        response = requests.get(f'https://t6.tvmeka.com/bbs/board.php?bo_table={_type}&page={_page}')
-        bs4 = BeautifulSoup(response.text, 'html.parser')
-        movie_list = bs4.find('div', class_='list-container')
-        movie_list = movie_list.find_all('div', class_='list-item')
-
-        result = []
-        for movie_ in movie_list:
-            title = movie_.find('h2').find('a').text
-            detail_link = movie_.find('h2').find('a')['href']
-            detail_num = urlparse(detail_link)
-            detail_num = ''.join(parse_qs(detail_num.query)['wr_id'])
-            # print(detail_num)
-            img_link = movie_.find('div', 'img-item').find('a')['href']
-            result.append({
-                'title': title.strip(),
-                'detail_link': detail_link.strip(),
-                'detail_num': detail_num.strip(),
-                'img_link': img_link.strip(),
-            })
-    if 'upstream' in params:
-        result = movie_except_upstream(_type, result)
-
-    return json.dumps(result)
-
-
-def movie_except_upstream(_type, result):
-    new_result = []
-    for d_ in result:
-        dd = request_detail(_type, d_['detail_num'])
-        if 0 < len(dd):
-            d_['video_link'] = dd[0]['detail']
-            new_result.append(d_)
-            continue
-
-    return new_result
-
-
-def evoload(link):
-    print(f'Start {link}')
-    headers = {
-        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
-        'cookie': 'adonis-session=b2a22f0492272a99313971370623a810HQ%2Fx1A98CUuxR9BOrPcqOPunsrpjz55R4zdYoJGYQJo54vWkLorL9Ye6Le%2B5UsHQ%2Foy5IV9PvQ805pE%2FdRIyI2JhttBjnLFugyu61yuHvbftEzi3%2BxqlbYO7DPhpmPlH; adonis-session-values=13b9747111fa0f3fe3c5701221726e0dO7NRiEik4e1eCrui%2FF60OpPqFL1s%2Fcg%2B%2BXSEHizlHwc%2BX%2FPO8HjfmpRKtEz%2FlLMcBZWj%2BcAdJYBbCSD7r%2BO9S%2FnL1KZROSBVwy3tm%2F%2FwFReqWaZlyYU6qpoZ17TQo1ppG7QNbk94EwEBsY9abk%2B%2F7Mv%2BcHyHExs4gunamlNSm%2F4%3D',
-    }
-    response = requests.get(link)
-    cookie = response.cookies.get_dict()
-    print(f'{cookie}')
-    print(f'end {link}, {response.headers}')
-    response = requests.post(
-        'https://evoload.io/SecurePlayer',
-        headers=response.headers
-    )
-
-    return response.text
-
-
-def request_detail(type_, num_):
-    link = f'https://t6.tvmeka.com/bbs/board.php?bo_table={type_}&wr_id={num_}&page=1'
-
-    response = requests.get(link)
-    bs4 = BeautifulSoup(response.text, 'html.parser')
-    table = bs4.find(class_='type11')
-    links = table.find_all('a')
-
-    result = []
-    for movie_link in links:
-        name = ''.join(movie_link['class'])
-        detail_link = movie_link['href']
-        video_link = ''
-
-        # TODO: 나중에는 모든 사이트에 비디오 링크 내놓도록
-        name = name.lower()
-        if not ('upstream' in name):
-            continue
-
-        # if 'Evo' in name or 'evo' in name:
-        #     evoload(detail_link)
-        #
-        # else:
-        #     response = requests.get(detail_link)
-        #     bs4_ = BeautifulSoup(response.text, 'html.parser')
-        #     clipboard.copy(response.text)
-        #     video_link = bs4_.find('video')['src']
-
-        result.append({
-            'name': name,
-            'detail': detail_link,
-            'video': video_link
-        })
-
-    return result
-
-
-@app.route('/movie/detail', methods=['GET'])
-def detail():
-    params = request.args.to_dict()
-    if not ('num' in params) or not ('type' in params):
-        return {'Error': 'No Link'}
-    type_ = params['type']
-    num_ = params['num']
-
-    result = request_detail(type_, num_)
-
-    return json.dumps(result)
+    resp = Response('{}')
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 
 @app.route('/youtube', methods=['GET'])
@@ -203,19 +57,20 @@ def youtube():
     # clipboard.copy(response.text)
 
     media_elements = bs4.find_all(class_='pure-u-1 pure-u-md-1-4')
+    result = []
     for media in media_elements:
         try:
             title = media.find('div', class_='thumbnail').parent.find_all('p')[1].text.strip()
         except:
             title = media.find('a').text.strip()
 
-        thumb = media.find('img')['src']
+        thumb = 'https://yewtu.be' + media.find('img')['src']
         link = ''
         detail_link = ''
         try:
             link = media.find(class_='icon ion-logo-youtube').parent['href'].strip()
             detail_link = link.split('?v=')[1]
-            detail_link = f'https://youtube.com/embed/{detail_link}?vq=1080p'
+            detail_link = f'https://youtube.com/embed/{detail_link}?vq=hd1080'
         except:
             pass
 
@@ -225,10 +80,80 @@ def youtube():
             'link': link,
             'embed_link': detail_link
         }
-        print(zip_)
+        result.append(zip_)
 
-    return '{}'
+    return returnResponse(json.dumps(result))
 
+
+class Youtube:
+    def search(self, keyword='우왁굳', page=1, max_result=20):
+        url = 'https://www.googleapis.com/youtube/v3/search'
+        params = {
+            'part': 'snippet',
+            'q': keyword,
+            # 'pageToken': page,
+            # 'videoEmbeddable': True,
+            'key': YOUTUBE_API_KEY,
+            'maxResult': max_result,
+        }
+        resp = requests.get(url, params=params)
+        return resp.text
+
+    def videos(self, max_result):
+        url = 'https://www.googleapis.com/youtube/v3/videos'
+        params = {
+            'key': YOUTUBE_API_KEY,
+            'part': 'snippet',
+            'chart': 'mostPopular',
+            'maxResults': max_result,
+            'regionCode': 'kr',
+        }
+
+        resp = requests.get(url, params=params)
+        return resp.text
+
+
+@app.route('/youtube/recommend', methods=['GET'])
+def youtube_recommend_api():
+    params = request.args.to_dict()
+
+    try:
+        max_result = params['max_result']
+    except:
+        max_result = 15
+
+    data = json.loads(youtube_.videos(max_result))
+
+    list = []
+
+    if 'items' in data:
+        for video in data['items']:
+            snippet = video['snippet']
+
+            id_ = video['id']
+            title = snippet['title']
+            desc = snippet['description']
+            try:
+                thumb = snippet['thumbnails']['standard']['url']
+            except:
+                thumb = ''
+            channel_title = snippet['channelTitle']
+
+            list.append({
+                'title': title,
+                'desc': desc,
+                'thumb': thumb,
+                'channelTitle': channel_title,
+                'embed_link': f'https://youtube.com/embed/{id_}',
+            })
+
+    return json.dumps(list)
+
+
+# Const
+youtube_ = Youtube()
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=4321)
+    # youtube.search()
+
+    app.run(debug=True, host='0.0.0.0', port=5005)
