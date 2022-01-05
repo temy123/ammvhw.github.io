@@ -12,6 +12,22 @@ function getKeyword() {
     return $('#keyword').val();
 }
 
+
+function changeHost() {
+    var url = host + 'movie/host'
+    var new_host = $('#host').val();
+
+    $.post(url, {
+            'host': new_host
+        },
+        function(response, textStatus, jqXHR) {
+            console.log(response);
+        }
+    );
+
+}
+
+
 function search() {
     var pageInput = document.getElementById('page');
     var typeIndex = getMovieType();
@@ -32,7 +48,7 @@ function search() {
     clearMovies();
 
     $.get(url, '',
-        function (movieData, textStatus, jqXHR) {
+        function(movieData, textStatus, jqXHR) {
             for (var i = 0; i < movieData.length; i++) {
                 var movieInfo = movieData[i];
                 addList(movieInfo);
@@ -166,7 +182,7 @@ function rebind(state) {
     setPage(state.page);
 }
 
-window.onpopstate = function (e) {
+window.onpopstate = function(e) {
     if (e.state) {
         rebind(e.state);
     }
@@ -182,13 +198,22 @@ function unselectAllMovieBtn() {
 }
 
 var loadingBar = null;
-window.onload = function () {
 
 
-    $(document).ajaxStart(function () {
+$(document).ready(function() {
+    $("#keyword").keydown(function(key) {
+        if (key.keyCode == 13) {
+            search();
+        }
+    })
+});
+
+window.onload = function() {
+
+    $(document).ajaxStart(function() {
             showProgress(); //ajax실행시 로딩바를 보여준다.
         })
-        .ajaxStop(function () {
+        .ajaxStop(function() {
             hideProgress(); //ajax종료시 로딩바를 숨겨준다.
         });
 
@@ -198,7 +223,7 @@ window.onload = function () {
     for (var i = 0; i < btns.length; i++) {
         var btn = btns[i];
         btn.setAttribute('index', i);
-        btn.onclick = function (e) {
+        btn.onclick = function(e) {
             unselectAllMovieBtn();
             this.setAttribute('aria-pressed', true);
             this.className += ' activate active'
