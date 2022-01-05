@@ -14,6 +14,11 @@ HOST = 'https://t8.tvmeka.com/'
 
 movie_container = Namespace('movie')
 
+DEFAULT_HEADERS = {
+    'Content-Type': 'application/json',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
+}
+
 
 @movie_container.route('/')
 class Movie(Resource):
@@ -198,3 +203,66 @@ class Detail(Resource):
         result = request_detail(type_, num_)
 
         return returnResponse(result)
+
+@movie_container.route('/noonoo')
+class NoonooTvRouter(Resource):
+
+
+class NoonooTv():
+    HOST = 'https://noonoo.tv/'
+    TYPE = [
+        'kr_movie',
+        'en_movie',
+        'adult_movie',
+        'ani_movie'
+    ]
+
+    def get(self, url, params={}):
+        headers = DEFAULT_HEADERS
+        headers['Referer'] = 'https://noonoo.tv/'
+        headers['Host'] = 'noonoo.tv'
+        resp = requests.get(url, params=params, headers=headers)
+        return resp
+
+    def get_type(self, num):
+        return self.TYPE[num]
+
+    def get_video_info(self, type_, num_):
+        url = f'{self.HOST}{type_}/{num_}'
+
+        resp = self.get(url)
+        bs = BeautifulSoup(resp.text, 'html.parser')
+        src = bs.find('lite-iframe').get('src')
+
+        print(src)
+        self.get_video_link(src)
+        clipboard.copy(resp.text)
+
+        return resp.text
+
+    def get_video_link(self, src):
+        headers = {
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            "referer": "https://noonoo.tv/",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
+        }
+        # url = 'https://player2.studiouniversal.net/video/WqQ6X8N7qMI1Rb4'
+        resp = requests.get(src, headers=headers)
+        new_src = resp.text.split('"file": "')[1].split('",')[0]
+        print(new_src)
+        return new_src
+
+    def get_m3u8(self, src):
+        headers = {
+            "referer": "https://cdn2.studiouniversal.net/",
+            "origin": "cdn2.studiouniversal.net"
+        }
+
+        resp = requests.get(src, headers=headers)
+        return resp.content
+
+
+if __name__ == '__main__':
+    noonoo = NoonooTv()
+    # noonoo.temp()
+    noonoo.get_video_info(noonoo.get_type(1), 1962)
