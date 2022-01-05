@@ -55,8 +55,6 @@ function loadVideos() {
             var movieInfo = data[i];
             addList(movieInfo);
         }
-
-        console.log(data);
     });
 }
 
@@ -160,7 +158,6 @@ function addList(d) {
     html += '<h6 class="card-title">' + title + '</h6>';
     html += '</div></div></a>';
 
-    console.log(d);
 
     listGroup.append(html);
 
