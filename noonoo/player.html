@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>누누티비 가져오기</title>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+    <script src="https://player-js.studiouniversal.net/hls.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/jwplayer.provider.hls.js"></script>
+    <script src="https://ssl.p.jwpcdn.com/player/v/8.21.2/jwplayer.js"></script>
+    <link href="/theme/assets/css/player.css?v=15" rel="stylesheet" />
+
+    <script src="./js/noonoo.js"></script>
+</head>
+
+<body>
+
+    <div id="jw_player"></div>
+
+    <script>
+        $(document).ready(function() {
+            var href = window.location.href;
+            var url = new URL(href);
+
+            var type = url.searchParams.get('type');
+            var num = url.searchParams.get('num');
+
+            loadVideo(type, num);
+        });
+    </script>
+
+</body>
+
+</html>

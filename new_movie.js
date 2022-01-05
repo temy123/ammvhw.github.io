@@ -161,14 +161,6 @@ function getMovieType() {
     return 0;
 }
 
-function showProgress() {
-    $('#progress').show();
-}
-
-function hideProgress() {
-    $('#progress').hide();
-}
-
 function rebind(state) {
     clearMovies();
     addMovies(state.movieData);
@@ -209,15 +201,7 @@ $(document).ready(function() {
 });
 
 window.onload = function() {
-
-    $(document).ajaxStart(function() {
-            showProgress(); //ajax실행시 로딩바를 보여준다.
-        })
-        .ajaxStop(function() {
-            hideProgress(); //ajax종료시 로딩바를 숨겨준다.
-        });
-
-    hideProgress();
+    bindProgress();
 
     var btns = getMovieButtons();
     for (var i = 0; i < btns.length; i++) {

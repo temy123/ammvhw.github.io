@@ -21,7 +21,7 @@ function search() {
         type: "get",
         url: url,
         dataType: 'json',
-        success: function (response) {
+        success: function(response) {
             addVideos(response);
             history.replaceState({
                 'videos': response,
@@ -76,14 +76,6 @@ function prev() {
     search();
 }
 
-function showProgress() {
-    $('#progress').show();
-}
-
-function hideProgress() {
-    $('#progress').hide();
-}
-
 function rebind(state) {
     clearMovies();
     addMovies(state.movieData);
@@ -112,7 +104,7 @@ function getRecommendVideos() {
     };
 
     $.get(url, params,
-        function (data, textStatus, jqXHR) {
+        function(data, textStatus, jqXHR) {
             addVideos(data);
             history.replaceState({
                 'videos': data,
@@ -124,21 +116,12 @@ function getRecommendVideos() {
     );
 }
 
-window.onpopstate = function (e) {
+window.onpopstate = function(e) {
     if (e.state) {
         rebind(e.state);
     }
 }
 
-$(document).ready(function () {
-
-    $(document).ajaxStart(function () {
-            showProgress(); //ajax실행시 로딩바를 보여준다.
-        })
-        .ajaxStop(function () {
-            hideProgress(); //ajax종료시 로딩바를 숨겨준다.
-        });
-
-
-    hideProgress();
+$(document).ready(function() {
+    bindProgress();
 });
