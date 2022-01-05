@@ -9,7 +9,7 @@ from flask import Flask, request, Response
 from flask_restx import Api
 from flask_cors import CORS
 
-from movie import movie_container
+from movie import movie_container, noonoo_container
 import logging
 
 logging.getLogger('flask_cors').level = logging.DEBUG
@@ -18,6 +18,7 @@ app = Flask(__name__)
 api = Api(app)
 
 api.add_namespace(movie_container, '/movie')
+api.add_namespace(noonoo_container, '/noonoo')
 
 CORS(app)
 
