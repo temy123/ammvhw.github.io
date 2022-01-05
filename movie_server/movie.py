@@ -206,6 +206,8 @@ class Detail(Resource):
 
 @movie_container.route('/noonoo')
 class NoonooTvRouter(Resource):
+    pass
+
 
 
 class NoonooTv():
