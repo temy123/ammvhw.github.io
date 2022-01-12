@@ -1,6 +1,11 @@
 body {
-    background-color: hsl(0, 0%, 7%);
+    background-color: hsl(0, 0%, 9%);
     color: white;
+}
+
+.form-control {
+    background-color: #121212;
+    color: #aaaaaa;
 }
 
 .youtube_container {
@@ -68,7 +73,8 @@ body {
 }
 
 .youtube_card_container .desc .text_container .top p {
-    color: #030303;
+    color: white;
+    /* color: #030303; */
     font-weight: 400;
     overflow: hidden;
     -webkit-line-clamp: 2;
@@ -92,7 +98,8 @@ p {
 
 .youtube_card_container .desc .text_container .bottom p {
     font-size: 12px;
-    color: #606060;
+    color: #aaaaaa;
+    /* color: #606060; */
     width: auto;
     overflow: hidden;
     -webkit-line-clamp: 1;

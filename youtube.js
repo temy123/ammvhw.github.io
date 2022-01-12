@@ -1,7 +1,8 @@
-function search() {
+var nextPageToken = '';
+var prevPageToken = '';
 
+function search(type_ = '') {
     var keyword = $('#keyword').val();
-    var page = $('#page').val();
 
     var url = "http://ipleOffice.iptime.org:5005/youtube?"
 
@@ -9,10 +10,10 @@ function search() {
         url += 'keyword=' + keyword;
     }
 
-    if (page) {
-        url += '&page=' + page;
-    } else {
-        $('#page').val(1);
+    if (type_ == 'next') {
+        url += `&page=${nextPageToken}`
+    } else if (type_ == 'prev') {
+        url += `&page=${prevPageToken}`
     }
 
     clearVideos();
@@ -21,12 +22,23 @@ function search() {
         type: "get",
         url: url,
         dataType: 'json',
-        success: function (response) {
-            addVideos(response);
+        success: function(response) {
+            addVideos_v2(response['list']);
+
+            if (response['nextPageToken']) {
+                nextPageToken = response['nextPageToken']
+            }
+
+            if (response['prevPageToken']) {
+                prevPageToken = response['prevPageToken']
+            }
+
+            console.log(nextPageToken);
+            console.log(prevPageToken);
+
             history.replaceState({
                 'videos': response,
                 'keyword': getKeyword(),
-                'page': getPage()
             }, '', './youtube.html##');
         },
     });
@@ -53,7 +65,7 @@ function addVideos(videoInfoes) {
 
 }
 
-function video(videoInfoes) {
+function addVideos_v2(videoInfoes) {
 
     for (var i = 0; i < videoInfoes.length; i++) {
         var d = videoInfoes[i];
@@ -102,37 +114,15 @@ function video(videoInfoes) {
 
 }
 
-function next() {
-    var pageDom = document.getElementById('page');
-    pageDom.value = (pageDom.value * 1) + 1;
-    search();
-
-}
-
-function prev() {
-    var pageDom = document.getElementById('page');
-    pageDom.value = (pageDom.value * 1) - 1;
-    search();
-}
-
-function rebind(state) {
-    clearMovies();
-    addMovies(state.movieData);
-
-    unselectAllMovieBtn();
-    var selectBtn = getMovieButtons()[state.movieType];
-    selectBtn.setAttribute('aria-pressed', true);
-    selectBtn.className += ' activate active'
-
-    setPage(state.page);
-}
-
 function rebind(state) {
     clearMovies();
     addVideos(state.videos);
 
     setKeyword(state.keyword);
-    setPage(state.page);
+}
+
+function getKeyword() {
+    return $('#keyword').val();
 }
 
 function getRecommendVideos() {
@@ -145,24 +135,30 @@ function getRecommendVideos() {
     clearVideos();
 
     $.get(url, params,
-        function (data, textStatus, jqXHR) {
-            video(data);
+        function(data, textStatus, jqXHR) {
+            addVideos_v2(data);
+            console.log(data);
             history.replaceState({
                 'videos': data,
-                'keyword': getKeyword(),
-                'page': getPage()
+                'keyword': getKeyword()
             }, '', './youtube.html##');
         },
         "json"
     );
 }
 
-window.onpopstate = function (e) {
+window.onpopstate = function(e) {
     if (e.state) {
         rebind(e.state);
     }
 }
 
-$(document).ready(function () {
+
+$(document).ready(function() {
     bindProgress();
+
 });
+
+window.onload = function() {
+    bindProgress();
+}
