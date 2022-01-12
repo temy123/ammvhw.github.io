@@ -1,14 +1,17 @@
 import requests
 import json
 import clipboard
+import time
 
 from urllib.parse import urlparse, parse_qs
 
 from bs4 import BeautifulSoup
 
 from core import returnResponse
-from flask import request, make_response
+from flask import request, Response, make_response
 from flask_restx import Resource, Api, Namespace
+
+from split_downloader import DownloadManager
 
 HOST = 'https://t8.tvmeka.com/'
 
@@ -237,7 +240,7 @@ class NoonooTvVideo(Resource):
 
 
 # 누누티비: M3U8 내부 내용 가져오기
-@noonoo_container.route('/video/<video_id>/content')
+@noonoo_container.route('/video/<video_id>/content.m3u8')
 class NoonooTvContent(Resource):
     def get(self, video_id):
         params = request.args.to_dict()
@@ -256,12 +259,28 @@ class NoonooTvContent(Resource):
 @noonoo_container.route('/video/<video_id>/<ts>')
 class NoonooTvMovieLoopback(Resource):
     def get(self, video_id, ts):
-        print('Ts 들어왔음')
         print(request.url)
+
         url = f'https://cdn2.studiouniversal.net/video/{video_id}/{ts}'
-        content = noonooTv.break_sop(url)
+
+        manager = DownloadManager()
+        
+        headers = {
+            "referer": "https://cdn2.studiouniversal.net/",
+            "origin": "cdn2.studiouniversal.net",
+            "accept-ranges": "bytes"
+        }
+
+        content = manager.request(url, headers=headers, splitter=3)
+
+        print('--- make_response start')
+        # response = Response(content, mimetype='video/MP2T')
         response = make_response(content)
+        print('--- make_response end')
         response.headers['content-type'] = 'video/MP2T'
+        response.headers['accept-ranges'] = f'bytes'
+        response.headers['accept-language'] = f'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
+        response.headers['cache-control'] = f'public, max-age=31919000'
 
         print('Ts 나갔음')
 
@@ -325,7 +344,7 @@ class NoonooTv():
     def get_m3u8(self, type_, num_):
         m3u8_link = self.get_video_link(type_, num_)
         content = self.break_sop(m3u8_link)
-        print(content)
+        print(f'get m3u8 Success : len {len(content)}')
         return content
 
     def get_m3u8_link(self, src):
@@ -340,18 +359,57 @@ class NoonooTv():
         print(new_src)
         return new_src
 
+    def break_sop_with_stream(self, src):
+        headers = {
+            "referer": "https://cdn2.studiouniversal.net/",
+            "origin": "cdn2.studiouniversal.net",
+            "accept-ranges": "bytes",
+        }
+
+        name = src.split('/')
+        name = name[len(name) - 1]
+        
+        time_ = time.time()
+
+        print(f'---- Stream data ({name}) start sec {time_}')
+        resp = requests.get(src, headers=headers, stream=True)
+        resp.raise_for_status()
+
+        # content = bytearray()
+        buff_time = time.time()
+        chunk_size_ = 64
+        for buff in resp.iter_content(chunk_size=chunk_size_):
+            buff_time = time.time()
+            if buff:
+                yield buff
+                # content += buff
+
+        time_ = time.time() - time_
+
+        print(f'---- Stream data ({name}) end sec {time_}')
+
+
     def break_sop(self, src):
         headers = {
             "referer": "https://cdn2.studiouniversal.net/",
             "origin": "cdn2.studiouniversal.net",
-            "cache-control": "public, max-age=31919000",
+            # "cache-control": "public, max-age=31919000",
             "accept-ranges": "bytes",
         }
 
-        print('데이터 받기 시작')
-        resp = requests.get(src, headers=headers, stream=True)
-        print('데이터 받기 끝')
+        name = src.split('/')
+        name = name[len(name) - 1]
+        
+        time_ = time.time()
+        
+        resp = requests.get(src, headers=headers)
         return resp.content
+        
+            # print('-- wrapping content')
+            # content = resp.content
+            # print(f'-- wrapping content end : len {len(content)}')
+
+            # return content
 
 
 noonooTv = NoonooTv()
