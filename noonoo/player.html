@@ -10,20 +10,52 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous">
+    </script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 
-    <script src="https://player-js.studiouniversal.net/hls.min.js"></script>
+    <!-- Video Js -->
+    <!-- <script src="https://vjs.zencdn.net/7.17.0/video.min.js"></script>
+    <link href="https://vjs.zencdn.net/7.17.0/video-js.css" rel="stylesheet" />
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.15.0/videojs-contrib-hls.min.js"></script> -->
+
+    <!-- Flash 뭐시기  -->
+    <!-- <script src="https://unpkg.com/videojs-flash/dist/videojs-flash.js"></script>
+    <script src="https://unpkg.com/videojs-contrib-hls/dist/videojs-contrib-hls.js"></script> -->
+
+    <!-- <script src="https://player-js.studiouniversal.net/hls.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/cdnbye@latest/dist/jwplayer.provider.hls.js"></script>
-    <script src="https://ssl.p.jwpcdn.com/player/v/8.21.2/jwplayer.js"></script>
-    <link href="/theme/assets/css/player.css?v=15" rel="stylesheet" />
+    <script src="https://ssl.p.jwpcdn.com/player/v/8.21.2/jwplayer.js"></script> -->
+    <!-- <link href="/theme/assets/css/player.css?v=15" rel="stylesheet" /> -->
+
+    <script src="./js/jwplayer.js"></script>
+    <link rel="stylesheet" href="./noonoo.css">
 
     <script src="./js/noonoo.js"></script>
 </head>
 
 <body>
 
-    <div id="jw_player"></div>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            outline: none;
+        }
+        
+        #container {
+            position: absolute;
+            width: 100%!important;
+            height: 100%!important;
+        }
+        
+        *:focus {
+            outline: none;
+        }
+    </style>
+    <div id="container"></div>
 
     <script>
         $(document).ready(function() {
@@ -33,6 +65,7 @@
             var type = url.searchParams.get('type');
             var num = url.searchParams.get('num');
 
+            // startVideoTest();
             loadVideo(type, num);
         });
     </script>

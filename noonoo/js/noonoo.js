@@ -1,5 +1,9 @@
 var host = 'http://ipleOffice.iptime.org:5005/';
 
+function test() {
+    alert('msgbox');
+}
+
 const movie_type = [
     'kr_movie',
     'en_movie',
@@ -9,20 +13,6 @@ const movie_type = [
 
 function clearMovies() {
     $('#parent').empty();
-}
-
-function changeHost() {
-    var url = host + 'movie/host'
-    var new_host = $('#host').val();
-
-    $.post(url, {
-            'host': new_host
-        },
-        function(response, textStatus, jqXHR) {
-            console.log(response);
-        }
-    );
-
 }
 
 function getMovieButtons() {
@@ -86,55 +76,44 @@ function loadVideo(type_, num_) {
         link = link.pathname.split('/');
         link = link[link.length - 2];
 
-        url = host + 'noonoo/video/' + link + '/content?type=' + type_ + '&num=' + num_
+        url = host + 'noonoo/video/' + link + '/content.m3u8?type=' + type_ + '&num=' + num_
 
-        jwplayer.key = "uoW6qHjBL3KNudxKVnwa3rt5LlTakbko9e6aQ6VUyKQ=";
-        window.disableP2pEngineIOSAutoInit = true;
-        var playerInstance = jwplayer("jw_player").setup({
-            width: "100%",
-            aspectratio: "16:9",
+        jwplayer("container").setup({
 
-            playlist: [{
-                sources: [{
-                    "default": false,
-                    "file": url,
-                    "type": "hls",
-                    "preload": "none",
-                }]
-            }],
-            "primary": "html5",
-            "hlshtml": true,
-            "cast": {},
+            controls: true,
+            displaytitle: true,
+            fullscreen: "true",
+            primary: 'html5',
+            stretching: "exactfit",
+            autostart: false,
+            androidhls: true,
+            liveTimeout: 60,
 
-
-            hlsjsConfig: {
-                maxBufferSize: 0,
-                maxBufferLength: 10,
-                liveSyncDurationCount: 10,
-                p2pConfig: {
-                    // showSlogan: false,
-                    live: true, // set to false in VOD mode
-                    // announceLocation: "hk",
-                    // useHttpRange: true,
-                }
-            },
-
-            playbackRateControls: true,
-            playbackRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3],
             skin: {
-                controlbar: {
-                    "icons": "rgba(255,255,255,1.0)",
-                    "iconsActive": "#ff0000"
-                },
-                timeslider: {
-                    "progress": "#ff0000",
-                }
+                name: 'Netflix',
             },
-        });
-        playerInstance.on("firstFrame", () => {});
 
+            captions: {
+                color: '#FFF',
+                fontSize: 14,
+                backgroundOpacity: 0,
+                edgeStyle: 'raised'
+            },
+            file: url
+        });
+        jwplayer("container").setCaptions({
+            "back": true,
+            "backgroundOpacity": "32",
+            "edgeStyle": "dropshadow",
+            "fontSize": 14,
+            "fontOpacity": 100,
+            "fontScale": 0.05,
+            "windowOpacity": 0,
+            "color": "#ffff00"
+        });
     });
 }
+
 
 function addList(d) {
     var listGroup = $('#parent');
@@ -162,7 +141,6 @@ function addList(d) {
     listGroup.append(html);
 
 }
-
 
 $(document).ready(function() {
     bindProgress();

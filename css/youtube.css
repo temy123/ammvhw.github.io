@@ -1,0 +1,103 @@
+body {
+    background-color: hsl(0, 0%, 7%);
+    color: white;
+}
+
+.youtube_container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 32px;
+}
+
+.youtube_card_container {
+    width: 100%;
+    max-width: 320px;
+    max-height: 260px;
+    /* float: inline-start; */
+    text-align: center;
+    padding: 16px;
+}
+
+.youtube_card_container .thumbs {
+    float: none;
+    position: relative;
+}
+
+.youtube_card_container img {
+    width: 100%;
+    height: 180px;
+}
+
+.youtube_card_container .thumbs p {
+    text-align: right;
+    right: 1%;
+    top: 86%;
+    position: absolute;
+    width: auto;
+    height: auto;
+    padding: 4px;
+    background-color: rgba( 0, 0, 0, 0.5);
+    color: white;
+    font-size: 10px;
+}
+
+.desc {
+    margin-top: 8px;
+    width: 100%;
+    float: left;
+    display: flex;
+}
+
+.img_container {
+    /* 나중에 채널 타이틀 가져올 수 있으면 이거 푸세용 */
+    display: none;
+}
+
+.youtube_card_container .desc .img_container img {
+    width: 48px;
+    height: 48px;
+}
+
+.youtube_card_container .desc .text_container {
+    margin-left: 8px;
+    width: 100%;
+    height: auto;
+    text-align: left;
+}
+
+.youtube_card_container .desc .text_container .top p {
+    color: #030303;
+    font-weight: 400;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
+
+p {
+    margin: 0px;
+}
+
+.bottom {
+    margin-top: 4px;
+}
+
+.youtube_card_container .desc .text_container .bottom .detail {
+    display: flex;
+}
+
+.youtube_card_container .desc .text_container .bottom p {
+    font-size: 12px;
+    color: #606060;
+    width: auto;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    white-space: normal;
+}

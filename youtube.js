@@ -21,7 +21,7 @@ function search() {
         type: "get",
         url: url,
         dataType: 'json',
-        success: function(response) {
+        success: function (response) {
             addVideos(response);
             history.replaceState({
                 'videos': response,
@@ -33,7 +33,7 @@ function search() {
 }
 
 function clearVideos() {
-    $('#list').empty();
+    $('.youtube_container').empty();
 }
 
 function addVideos(videoInfoes) {
@@ -48,17 +48,56 @@ function addVideos(videoInfoes) {
         html += '<h6 class="card-title">' + d['title'] + '</h6>';
         html += '</div></div></a>';
 
-
-        // html += '<div>';
-        // html += '<a href="' + d['embed_link'] + '" class="card-link">';
-        // html += '<img class="card-img-top" src="' + d['thumb'] + '" alt="Card image cap">';
-        // html += '<div class="card-body">';
-        // html += '<h4 class="card-title">' + d['title'] + '</h4>';
-        // html += '</div>';
-        // html += '</a>';
-        // html += '</div>';
-
         $('#list').append(html);
+    }
+
+}
+
+function video(videoInfoes) {
+
+    for (var i = 0; i < videoInfoes.length; i++) {
+        var d = videoInfoes[i];
+
+        var html = `
+        <a href="${d['embed_link']}">
+
+        <div class="youtube_card_container">
+          <div class="thumbs">
+            <img src="${d['thumb']}">
+            <p id="length">
+              ${d['duration']}
+            </p>
+          </div>
+          <div class="desc">
+            <div class="img_container">
+              <div>
+                <img src="#" />
+
+              </div>
+            </div>
+            <div class="text_container">
+              <div class="top">
+                <p>${d['title']}</p>
+              </div>
+              <div class="bottom">
+                <p id="author">${d['channelTitle']}</p>
+
+                <div class="detail">
+
+                  <p id="viewer" >조회수 ${d['viewCount']}회</p>
+                  <p id="date" style="margin-left: 8px;" >${d['published']}</p>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        </a>
+
+        `;
+
+        $('.youtube_container').append(html);
     }
 
 }
@@ -103,9 +142,11 @@ function getRecommendVideos() {
         'max_result': 30
     };
 
+    clearVideos();
+
     $.get(url, params,
-        function(data, textStatus, jqXHR) {
-            addVideos(data);
+        function (data, textStatus, jqXHR) {
+            video(data);
             history.replaceState({
                 'videos': data,
                 'keyword': getKeyword(),
@@ -116,12 +157,12 @@ function getRecommendVideos() {
     );
 }
 
-window.onpopstate = function(e) {
+window.onpopstate = function (e) {
     if (e.state) {
         rebind(e.state);
     }
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     bindProgress();
 });
