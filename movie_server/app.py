@@ -38,7 +38,7 @@ def youtube():
     params = request.args.to_dict()
 
     _keyword = ''
-    _page = '1'
+    _page = ''
 
     if 'keyword' in params:
         _keyword = params['keyword']
@@ -46,58 +46,46 @@ def youtube():
     if 'page' in params:
         _page = params['page']
 
-    headers = {
-        'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+    result = json.loads(youtube_.search(_keyword, _page))
+    list = dumps_youtube_videos(result)
 
+    next_token = ''
+    prev_token = ''
+
+    if 'nextPageToken' in result:
+        next_token = result['nextPageToken']
+    if 'prevPageToken' in result:
+        prev_token = result['prevPageToken']
+
+    result = {
+        'nextPageToken' : next_token,
+        'prevPageToken' : prev_token,
+        'list' : list,
     }
-    response = requests.get(f'https://yewtu.be/search?q={_keyword}&page={_page}')
-    response.raise_for_status()
-    response.encoding = 'utf-8'
-
-    bs4 = BeautifulSoup(response.text, 'html.parser')
-
-    # clipboard.copy(response.text)
-
-    media_elements = bs4.find_all(class_='pure-u-1 pure-u-md-1-4')
-    result = []
-    for media in media_elements:
-        try:
-            title = media.find('div', class_='thumbnail').parent.find_all('p')[1].text.strip()
-        except:
-            title = media.find('a').text.strip()
-
-        thumb = 'https://yewtu.be' + media.find('img')['src']
-        link = ''
-        detail_link = ''
-        try:
-            link = media.find(class_='icon ion-logo-youtube').parent['href'].strip()
-            detail_link = link.split('?v=')[1]
-            detail_link = f'https://youtube.com/embed/{detail_link}?vq=hd1080'
-        except:
-            pass
-
-        zip_ = {
-            'title': title,
-            'thumb': thumb,
-            'link': link,
-            'embed_link': detail_link
-        }
-        result.append(zip_)
 
     return returnResponse(json.dumps(result))
 
 
 class Youtube:
-    def search(self, keyword='우왁굳', page=1, max_result=20):
+    def search(self, keyword='우왁굳', page='', max_result=20):
         url = 'https://www.googleapis.com/youtube/v3/search'
         params = {
-            'part': 'snippet, contentDetails, statistics',
+            'part': 'snippet',
             'q': keyword,
             # 'pageToken': page,
             # 'videoEmbeddable': True,
             'key': YOUTUBE_API_KEY,
-            'maxResult': max_result,
+            'eventType': 'none',
+            'regionCode': 'kr',
+            'maxResults': max_result,
+            'type':'video',
+            'videoEmbeddable': True
         }
+
+        if page:
+            params['pageToken'] = page
+
+        print(f'url : {url} params : {params}')
         resp = requests.get(url, params=params)
         return resp.text
 
@@ -130,27 +118,23 @@ class Youtube:
         resp = requests.get(url, params=params)
         return resp.text
 
-
-@app.route('/youtube/recommend', methods=['GET'])
-def youtube_recommend_api():
-    params = request.args.to_dict()
-
-    try:
-        max_result = params['max_result']
-    except:
-        max_result = 15
-
-    data = json.loads(youtube_.videos(max_result))
-    clipboard.copy(json.dumps(data))
+def dumps_youtube_videos(videos):
     list = []
 
-    if 'items' in data:
-        for video in data['items']:
+    if 'items' in videos:
+        for video in videos['items']:
             snippet = video['snippet']
 
             id_ = video['id']
+            if isinstance(id_, dict):
+                id_ = video['id']['videoId']
+
             title = snippet['title']
             desc = snippet['description']
+            duration = ''
+            view_count = ''
+            published = ''
+
             if 'standard' in snippet['thumbnails']:
                 thumb = snippet['thumbnails']['standard']['url']
             elif 'high' in snippet['thumbnails']:
@@ -171,26 +155,28 @@ def youtube_recommend_api():
 
             channel_title = snippet['channelTitle']
 
-            content_details = video['contentDetails']
-            duration = content_details['duration']
-            duration = duration[2:]
-            duration_array = []
-            if 'H' in duration:
-                duration_array.append(int(duration.split('H')[0]))
-                duration = duration.split('H')[1]
-            if 'M' in duration:
-                duration_array.append(int(duration.split('M')[0]))
-                duration = duration.split('M')[1]
-            if 'S' in duration:
-                duration_array.append(int(duration.split('S')[0]))
-            
-            duration = ''
-            for d in duration_array:
-                duration = f'{duration:0>2}:{d:0>2}'
-            duration = duration[1:]
+            if 'contentDetails' in video:
+                content_details = video['contentDetails']
+                duration = content_details['duration']
+                duration = duration[2:]
+                duration_array = []
+                if 'H' in duration:
+                    duration_array.append(int(duration.split('H')[0]))
+                    duration = duration.split('H')[1]
+                if 'M' in duration:
+                    duration_array.append(int(duration.split('M')[0]))
+                    duration = duration.split('M')[1]
+                if 'S' in duration:
+                    duration_array.append(int(duration.split('S')[0]))
+                
+                duration = ''
+                for d in duration_array:
+                    duration = f'{duration:0>2}:{d:0>2}'
+                duration = duration[1:]
 
-            statistics = video['statistics']
-            view_count = statistics['viewCount']
+            if 'statistics' in video:
+                statistics = video['statistics']
+                view_count = statistics['viewCount']
 
             list.append({
                 'title': title,
@@ -202,6 +188,22 @@ def youtube_recommend_api():
                 'channelTitle': channel_title,
                 'embed_link': f'https://youtube.com/embed/{id_}',
             })
+
+    return list
+
+
+
+@app.route('/youtube/recommend', methods=['GET'])
+def youtube_recommend_api():
+    params = request.args.to_dict()
+
+    try:
+        max_result = params['max_result']
+    except:
+        max_result = 15
+
+    data = json.loads(youtube_.videos(max_result))
+    list = dumps_youtube_videos(data)
 
     return json.dumps(list)
 
