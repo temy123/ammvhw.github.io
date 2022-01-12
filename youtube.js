@@ -65,10 +65,21 @@ function addVideos(videoInfoes) {
 
 }
 
+function isBlackList(channelTitle) {
+    var BlackList = [
+        '맛있는 녀석들 (Tasty Guys)',
+        'YouTube Movies',
+    ]
+    console.log(`BlackList ? : ${channelTitle}`);
+    return BlackList.includes(channelTitle);
+}
+
 function addVideos_v2(videoInfoes) {
 
     for (var i = 0; i < videoInfoes.length; i++) {
         var d = videoInfoes[i];
+
+        if (isBlackList(d['channelTitle'])) continue;
 
         var html = `
         <a href="${d['embed_link']}">
