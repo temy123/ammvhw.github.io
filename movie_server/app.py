@@ -87,6 +87,7 @@ class Youtube:
 
         print(f'url : {url} params : {params}')
         resp = requests.get(url, params=params)
+        clipboard.copy(resp.text)
         return resp.text
 
     def browse(self, key):
